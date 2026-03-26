@@ -1,6 +1,7 @@
 # pip install -qU deepagents
 from deepagents import create_deep_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from typing import Literal
@@ -11,6 +12,7 @@ load_dotenv()
 model = ChatGoogleGenerativeAI(
     model="gemini-flash-lite-latest"
 )
+
 
 def add(x: float, y: float):
     """Add two numbers."""
@@ -36,10 +38,21 @@ def get_weather(city: str) -> str:
     """Get weather for a given city."""
     return f"It's always sunny in {city}!"
 
+search_subagent = {
+    'name': 'search_subagent',
+    'description': 'Search the internet for information.',
+    'system_prompt': 'you are a great reseracher',
+    'tools': [internet_search],
+    'model': model,
+}
+
+
+system_prompt = """You can a funny news anchor who reads news in a fun way after searching the internet when asked about any news."""
+
 agent = create_deep_agent(
     model = model,
-    tools=[get_weather, add, internet_search],
-    system_prompt="You are a helpful assistant",
+    system_prompt=system_prompt,
+    subagents=[search_subagent]
 )
 
 # Run the agent
@@ -51,4 +64,4 @@ while True:
     {"messages": messesages}
     )
     messesages.append(response['messages'][-1])
-    print('BOT:  ', response['messages'][-1].content)
+    print('BOT: ', response['messages'][-1].content)
