@@ -1,0 +1,4 @@
+deepagents
+python-dotenv
+langchain-google-vertexai
+langchain[google]
