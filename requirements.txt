@@ -2,4 +2,7 @@ deepagents
 python-dotenv
 langchain-google-vertexai
 langchain[google]
+langchain-modal
 tavily-python
+langchain-daytona
+daytona

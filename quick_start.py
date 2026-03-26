@@ -5,6 +5,8 @@ from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from typing import Literal
+from langchain_daytona import DaytonaSandbox
+from daytona import Daytona
 import os
 
 load_dotenv()
@@ -12,6 +14,10 @@ load_dotenv()
 model = ChatGoogleGenerativeAI(
     model="gemini-flash-lite-latest"
 )
+
+#setup the sandbox
+app = Daytona().create()
+backend = DaytonaSandbox(sandbox=app)
 
 
 def add(x: float, y: float):
@@ -46,13 +52,21 @@ search_subagent = {
     'model': model,
 }
 
+python_subagent = {
+    'name': 'python_subagent',
+    'description': 'Run python code.',
+    'system_prompt': 'you are a great python programmer',
+    'backend': backend,
+    'model': model,
+}
+
 
 system_prompt = """You can a funny news anchor who reads news in a fun way after searching the internet when asked about any news."""
 
 agent = create_deep_agent(
     model = model,
     system_prompt=system_prompt,
-    subagents=[search_subagent]
+    subagents=[search_subagent, python_subagent]
 )
 
 # Run the agent
