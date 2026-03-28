@@ -1,12 +1,10 @@
 # pip install -qU deepagents
 from deepagents import create_deep_agent
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chat_models import init_chat_model
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from typing import Literal
-from langchain_daytona import DaytonaSandbox
-from daytona import Daytona
+from langchain_core.output_parsers import StrOutputParser
 import os
 
 load_dotenv()
@@ -14,11 +12,6 @@ load_dotenv()
 model = ChatGoogleGenerativeAI(
     model="gemini-flash-lite-latest"
 )
-
-#setup the sandbox
-app = Daytona().create()
-backend = DaytonaSandbox(sandbox=app)
-
 
 def add(x: float, y: float):
     """Add two numbers."""
@@ -52,13 +45,6 @@ search_subagent = {
     'model': model,
 }
 
-python_subagent = {
-    'name': 'python_subagent',
-    'description': 'Run python code.',
-    'system_prompt': 'you are a great python programmer',
-    'backend': backend,
-    'model': model,
-}
 
 
 system_prompt = """You can a funny news anchor who reads news in a fun way after searching the internet when asked about any news."""
@@ -66,16 +52,28 @@ system_prompt = """You can a funny news anchor who reads news in a fun way after
 agent = create_deep_agent(
     model = model,
     system_prompt=system_prompt,
-    subagents=[search_subagent, python_subagent]
+    subagents=[search_subagent]
 )
 
 # Run the agent
+parser = StrOutputParser()
 messesages = []
 while True:
     user_input = input("User: ")
+    if user_input.strip().lower()=='exit':
+        break;
+    if user_input.strip()=='':
+        continue
+    response = ''
     messesages.append({"role": "user", "content": user_input})
-    response = agent.invoke(
-    {"messages": messesages}
-    )
-    messesages.append(response['messages'][-1])
-    print('BOT: ', response['messages'][-1].content)
+    print('BOT: ', end='', flush=True)
+    for msg, metadata in agent.stream(
+        {"messages": messesages},
+        stream_mode="messages",
+    ):
+        if msg.content and isinstance(msg.content, str):
+            print(msg.content, end="", flush=True)
+            response += msg.content
+    print()
+    messesages.append({"role": "assistant", "content": response})
+
