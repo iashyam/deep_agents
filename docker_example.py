@@ -19,7 +19,9 @@ agent = create_deep_agent(
     model=model,
     system_prompt="You are a coding assistant with access to a Docker-based sandbox. "
                   "You can run shell commands and python scripts in this environment. "
-                  "Use the 'execute' tool to run commands.",
+                  "Determine if you need to write a python script to solve the problem and if you do then write it and run it."
+                  "Use the 'execute' tool to run commands."
+                  "Use 'download_file' tool to save the files from sandbox to local.",
     backend=backend,
 )
 
@@ -28,7 +30,7 @@ print("--- Starting Agent ---")
 result = agent.invoke(
     {
         "messages": [
-            {"role": "user", "content": "Check the python version in the sandbox and then write a script that calculates the first 10 fibonacci numbers and run it."}
+            {"role": "user", "content": " Calculate the velocity with which an object is shot at an angle of 60° from the ground, and it reaches its maximum height in the 20s. Take g = 10 m/s2. Plot the trajectory to show! save the plot as plot.png"}
         ]
     }
 )
@@ -38,4 +40,4 @@ print("\n--- Agent Response ---")
 print(result["messages"][-1].content)
 
 # Clean up the container when done (optional)
-# backend.cleanup()
+backend.cleanup()
