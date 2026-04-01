@@ -30,7 +30,7 @@ print("--- Starting Agent ---")
 result = agent.invoke(
     {
         "messages": [
-            {"role": "user", "content": " Calculate the velocity with which an object is shot at an angle of 60° from the ground, and it reaches its maximum height in the 20s. Take g = 10 m/s2. Plot the trajectory to show! save the plot as plot.png"}
+            {"role": "user", "content": " Calculate the velocity with which an object is shot at an angle of 60° from the ground, and it reaches its maximum height in the 20s. Take g = 10 m/s2. Plot the trajectory to show! download in the local the plot as plot.png"}
         ]
     }
 )
